@@ -1,1 +1,1 @@
-# sp24-cs411-team105-Palworld
+# team105-Palworld
