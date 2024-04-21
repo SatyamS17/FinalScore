@@ -104,7 +104,7 @@ export default function PlayersPage() {
 
     return (
         <div className="bg-white text-black p-6"> 
-        <div className="container mx-auto"> <h1 className='text-3xl font-bold'>Player Management</h1>
+        <div className="container mx-auto"> <h1 className='text-3xl font-bold'>Final Score</h1>
       
           <div className="grid grid-cols-2 gap-8 mt-6">
             <section className="border border-gray-300 rounded-md p-4"> 
@@ -214,7 +214,7 @@ export default function PlayersPage() {
       
             <div className="grid grid-cols-1 gap-8 mt-4"> 
               <div>
-                <h3 className='text-xl mb-2'>Player Call Results</h3>
+                <h3 className='text-xl mb-2'>Player Call Results for <span className='italic'>{playerName}</span></h3>
                 <table className="w-full table-auto border-collapse border"> <thead>
                     <tr>
                       <th className="border p-2">Date</th>
@@ -242,9 +242,10 @@ export default function PlayersPage() {
               </div>
       
               <div>
-                <h3 className='text-xl mb-2'>Call Count Results</h3>
+                <h3 className='text-xl mb-2'>Call Count Results for <span className='italic'>{playerName}</span></h3>
                 {callCountResult !== null ? ( 
                   <p className="text-lg font-bold">Number of {callType} {decisionType} calls: <span className='text-green-600'>{callCountResult}</span></p> 
+                  
                 ) : (
                   <p>No call count results found.</p>
                 )}
