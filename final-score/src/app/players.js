@@ -16,6 +16,8 @@ export default function PlayersPage() {
     const [addPlayerMessage, setAddPlayerMessage] = useState(''); 
     const [teamOptions, setTeamOptions] = useState([]);
     const [callOptions, setCallOptions] = useState([]);
+    const [newCallType, setNewCallType] = useState('');
+    const [newDecisionType, setNewDecisionType] = useState('');
 
     // Fetch teams for dropdown
     useEffect(() => {
@@ -106,17 +108,20 @@ export default function PlayersPage() {
     // Update Call
     const handleUpdateCall = async (e) => {
         e.preventDefault();
+        console.log('in handler:', selectedCallId);
+        console.log('in handler:', newCallType);
+        console.log('in handler:', newDecisionType);
         const response = await fetch(`/api/calls`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({selectedCallId, callType, decisionType}),
+            body: JSON.stringify({selectedCallId, newCallType, newDecisionType}),
           });
 
         if (response.ok) {
             const updateForm = document.getElementById('updateForm'); 
             updateForm.classList.add('hidden');
             
-            console.log("DONE!!!");
+            
         } else {
             console.error('Error deleting call:', await response.text());
         }
@@ -146,8 +151,7 @@ export default function PlayersPage() {
         const updateForm = document.getElementById('updateForm'); 
         updateForm.classList.remove('hidden');
 
-        const callTypeInput = document.getElementById('form_callType');
-        callTypeInput.value = calltype;
+        setSelectedCallId(call_id);
 
         // FIX THIS EVENTUALLY!!
         // const callDesicion = document.getElementById('form_decisionType');  
@@ -379,7 +383,7 @@ export default function PlayersPage() {
                 </label>
                 <select
                   id="form_callType"
-                  onChange={(e) => setCallType(e.target.value)}
+                  onChange={(e) => setNewCallType(e.target.value)}
                   className="border border-gray-300 rounded-md w-full px-3 py-2"
                 >
                   <option value="">Select a Call Type</option>
@@ -400,12 +404,14 @@ export default function PlayersPage() {
                   </label>
                   <select
                     id="form_decisionType"
-                    onChange={(e) => setDecisionType(e.target.value)}
+                    onChange={(e) => {setNewDecisionType(e.target.value)}}
                     className="border border-gray-300 rounded-md w-full px-3 py-2"
                   >
                     <option value="">Select a Decision</option>
-                    <option value="incorrect">CC</option>
-                    <option value="correct">CNC</option>
+                    <option value="CC">CC</option>
+                    <option value="CNC">CNC</option>
+                    <option value="INC">INC</option>
+                    <option value="IC">IC</option>
                   </select>
                 </div>
                 <div className='p-2'>
@@ -425,6 +431,7 @@ export default function PlayersPage() {
                 <h3 className='text-xl mb-2'>Player Call Results for <span className='italic'>{playerName}</span></h3>
                 <table className="w-full table-auto border-collapse border"> <thead>
                     <tr>
+                      <th className="border p-2">Call ID</th>
                       <th className="border p-2">Date</th>
                       <th className="border p-2">Home Team</th>
                       <th className="border p-2">Away Team</th>
@@ -439,6 +446,7 @@ export default function PlayersPage() {
                         <td className="border p-2">
                           {call.game_date.substring(0, 10)}
                         </td>
+                        <td className="border p-2">{call.call_id}</td>
                         <td className="border p-2">{call.home_team}</td>
                         <td className="border p-2">{call.away_team}</td>
                         <td className="border p-2">{call.box_score}</td>
