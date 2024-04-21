@@ -22,16 +22,12 @@ export default async function handler(req, res) {
    }
    else if (req.method === 'POST' ) {
     const { selectedCallId, newCallType, newDecisionType} = req.body;
-    console.log('pinging api: ', selectedCallId);
-    console.log('pinging api: ', newCallType);
-    console.log('pinging api: ', newDecisionType);
     const db = await mysql.createConnection(dbConfig);
-    await db.execute(`UPDATE Calls SET call_type = ${newCallType}, decision = ${newDecisionType} WHERE call_id = ${selectedCallId}`);
-    
-
-    //await db.execute(`SELECT * FROM WHERE (call_type = ${newCallType} AND decision = ${newDecisionType} AND call_id = ${selectedCallId})`);
-
+    const sql = `UPDATE Calls SET call_type = ?, decision = ? WHERE call_id = ?`;
+    const values = [newCallType, newDecisionType, selectedCallId];
+    await db.execute(sql, values);    
     await db.end(); 
+    
     res.status(200).json({'message': `Updated call ${selectedCallId}`}); 
    }
    else {

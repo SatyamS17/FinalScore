@@ -64,9 +64,9 @@ export default function PlayersPage() {
             console.error('Error fetching calls:', data.error);
         } else {
             setPlayerResults(data);
-            setPlayerName('');
-            setYear('');
-            setLimit('');
+            // setPlayerName('');
+            // setYear('');
+            // setLimit('');
         }
     };
 
@@ -108,9 +108,7 @@ export default function PlayersPage() {
     // Update Call
     const handleUpdateCall = async (e) => {
         e.preventDefault();
-        console.log('in handler:', selectedCallId);
-        console.log('in handler:', newCallType);
-        console.log('in handler:', newDecisionType);
+
         const response = await fetch(`/api/calls`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -120,8 +118,7 @@ export default function PlayersPage() {
         if (response.ok) {
             const updateForm = document.getElementById('updateForm'); 
             updateForm.classList.add('hidden');
-            
-            
+            handlePlayerCallSearch(e);
         } else {
             console.error('Error deleting call:', await response.text());
         }
@@ -152,6 +149,9 @@ export default function PlayersPage() {
         updateForm.classList.remove('hidden');
 
         setSelectedCallId(call_id);
+
+        const callTypeUp = document.getElementById('form_callType');  
+        callTypeUp.value = calltype;
 
         // FIX THIS EVENTUALLY!!
         // const callDesicion = document.getElementById('form_decisionType');  
