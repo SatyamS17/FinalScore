@@ -120,11 +120,11 @@ export default function PlayersPage() {
             updateForm.classList.add('hidden');
             handlePlayerCallSearch(e);
         } else {
+            const updateForm = document.getElementById('updatecallerror'); 
+            updateForm.classList.remove('hidden');
             console.error('Error deleting call:', await response.text());
         }
 
-        const updateForm = document.getElementById('updateForm'); 
-        updateForm.classList.add('hidden');
     };
 
      // Delete Call from Database
@@ -153,17 +153,22 @@ export default function PlayersPage() {
         const callTypeUp = document.getElementById('form_callType');  
         callTypeUp.value = calltype;
 
-        // FIX THIS EVENTUALLY!!
-        // const callDesicion = document.getElementById('form_decisionType');  
-        // callDesicion.value = decision;
-        // console.log(callDesicion.value);
+        setNewDecisionType(decision);
     };
 
     // closes the popup
     function hidepopup() {
         const updateForm = document.getElementById('updateForm'); 
         updateForm.classList.add('hidden');
+
+        hideerror();
     };
+
+    // closes the error in the popup
+    function hideerror() {
+        const popuperror = document.getElementById('updatecallerror'); 
+        popuperror.classList.add('hidden');
+    }
 
     return (
         <div className="bg-white text-black p-6"> 
@@ -364,11 +369,21 @@ export default function PlayersPage() {
             </div>
           </section>
           <section className="mt-8">
+            
             <h2 className="text-3xl font-bold">Results</h2>
             <div id="updateForm" className="hidden fixed inset-0 bg-gray-500 bg-opacity-50 overflow-y-auto px-4 py-6 sm:px-0 content-center">
+                
                 <div className="relative w-full max-w-sm mx-auto rounded-md shadow-lg bg-white">
+                <div id='updatecallerror' class=" hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative p-2" role="alert">
+                    <strong class="font-bold">Invalid Call!</strong>
+                    <span class="block sm:inline">   Please try again.</span>
+                    <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+                        <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" onClick={hideerror} viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+                    </span>
+                    </div>
                     <div className="flex justify-between items-center p-4 border-b border-gray-200">
                     <h3 className="text-xl font-medium text-gray-900">Update Call</h3>
+                    
                     <button type="button" className="bg-gray-500 hover:bg-red-500 text-white py-1 px-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onClick={hidepopup}>
                         Close
                     </button>
@@ -404,6 +419,7 @@ export default function PlayersPage() {
                   </label>
                   <select
                     id="form_decisionType"
+                    value={newDecisionType}
                     onChange={(e) => {setNewDecisionType(e.target.value)}}
                     className="border border-gray-300 rounded-md w-full px-3 py-2"
                   >

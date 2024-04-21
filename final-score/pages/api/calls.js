@@ -23,6 +23,12 @@ export default async function handler(req, res) {
    else if (req.method === 'POST' ) {
     const { selectedCallId, newCallType, newDecisionType} = req.body;
     const db = await mysql.createConnection(dbConfig);
+
+    // check for invalid paramaters
+    if(newCallType === "" || newDecisionType === "") {
+        res.status(500).end();
+    }
+
     const sql = `UPDATE Calls SET call_type = ?, decision = ? WHERE call_id = ?`;
     const values = [newCallType, newDecisionType, selectedCallId];
     await db.execute(sql, values);    
@@ -39,7 +45,6 @@ export default async function handler(req, res) {
 const handleDeleteCall = async (callId, res) => {
     try {
         const query = `DELETE FROM Calls WHERE call_id = ?`;
-
         const db = await mysql.createConnection(dbConfig);
         await db.query(query, [callId]);
         await db.end(); 
