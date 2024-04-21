@@ -88,19 +88,18 @@ export default function PlayersPage() {
 
      // Delete Call from Database
      async function handleDeleteEntry(callId) {
-
-        // this doesn't print
-        console.log(callId);
-
-        // commented this out for now but return 404 and somehow runs but the print statement above doesnt?
-        // const response = await fetch(`/api/calls/${callId}`, {
-        //   method: 'DELETE',
-        // });
-        // if (response.ok) {
-        //   setPlayerResults(playerResults.filter((call) => call.call_id !== callId));
-        // } else {
-        //   console.error('Error deleting call:', await response.text());
-        // }
+        
+        const response = await fetch(`/api/calls`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ callId }),
+          });
+        
+        if (response.ok) {
+            setPlayerResults(playerResults.filter((call) => call.call_id !== callId));
+        } else {
+          console.error('Error deleting call:', await response.text());
+        }
     };
 
     return (

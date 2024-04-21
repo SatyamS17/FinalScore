@@ -10,9 +10,8 @@ const dbConfig = {
 
 
 export default async function handler(req, res) {
-    console.log("TEST!");
    if (req.method === 'DELETE' ) {    
-    const callId = req.url.split('/')[3];
+    const { callId } = req.body;
     await handleDeleteCall(callId, res);
    }
    else {
@@ -23,15 +22,13 @@ export default async function handler(req, res) {
 
 const handleDeleteCall = async (callId, res) => {
     try {
-        console.log("TEST!")
-        const deleteQuery = `DELETE FROM calls WHERE call_id = ?`;
-        const [result] = await pool.query(deleteQuery, [callId]);
-   
-        if (result.affectedRows === 1) {
-          res.json({ message: `Call with ID ${callId} deleted successfully!` });
-        } else {
-          res.status(400).json({ error: 'Failed to delete call' });
-        }
+        const query = `DELETE FROM Calls WHERE call_id = ?`;
+
+        const db = await mysql.createConnection(dbConfig);
+        await db.query(query, [callId]);
+        await db.end(); 
+        
+        res.status(200).json({ message: 'Call deleted successfully' });
       } catch (error) {
         console.error('Error deleting call:', error);
         res.status(500).json({ error: 'Internal server error' });
