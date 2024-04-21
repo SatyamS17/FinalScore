@@ -86,6 +86,23 @@ export default function PlayersPage() {
         }
     };
 
+     // Delete Call from Database
+     async function handleDeleteEntry(callId) {
+
+        // this doesn't print
+        console.log(callId);
+
+        // commented this out for now but return 404 and somehow runs but the print statement above doesnt?
+        // const response = await fetch(`/api/calls/${callId}`, {
+        //   method: 'DELETE',
+        // });
+        // if (response.ok) {
+        //   setPlayerResults(playerResults.filter((call) => call.call_id !== callId));
+        // } else {
+        //   console.error('Error deleting call:', await response.text());
+        // }
+    };
+
     return (
         <div className="bg-white text-black p-6"> 
         <div className="container mx-auto"> <h1 className='text-3xl font-bold'>Player Management</h1>
@@ -207,7 +224,6 @@ export default function PlayersPage() {
                       <th className="border p-2">Box Score</th>
                       <th className="border p-2">Call Type</th>
                       <th className="border p-2">Decision</th>
-                      
                       </tr>
                   </thead>
                   <tbody>
@@ -219,6 +235,7 @@ export default function PlayersPage() {
                         <td className="border p-2">{call.box_score}</td>
                         <td className="border p-2">{call.call_type}</td>
                         <td className="border p-2">{call.decision}</td>
+                        <td><button onClick={() => handleDeleteEntry(call.call_id)} className='border-hidden text-red-500 font-bold p-2 text-lg'>X</button></td>
                         </tr>
                     ))}
                   </tbody>
