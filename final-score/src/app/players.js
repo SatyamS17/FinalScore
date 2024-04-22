@@ -16,8 +16,19 @@ export default function PlayersPage() {
     const [addPlayerMessage, setAddPlayerMessage] = useState(''); 
     const [teamOptions, setTeamOptions] = useState([]);
     const [callOptions, setCallOptions] = useState([]);
+    const [refOptions, setRefOptions] = useState([]);
+    const [playerOptions, setPlayerOptions] = useState([]);
     const [newCallType, setNewCallType] = useState('');
     const [newDecisionType, setNewDecisionType] = useState('');
+    const [selectedCallType, setselectedCallType] = useState('');
+    const [selectedref1, setSelectedRef1] = useState('');
+    const [selectedref2, setSelectedRef2] = useState('');
+    const [selectedref3, setSelectedRef3] = useState('');
+    const [selectedcommited, setCommited] = useState('');
+    const [selecteddisadvantaged, setDisadvantaged] = useState('');
+    const [selectedTimeLeft, setTimeLeft] = useState('');
+    const [selectedPeriod, setPeriod] = useState('');
+    const [selectedComment, setComment] = useState('');
 
     // Fetch teams for dropdown
     useEffect(() => {
@@ -48,6 +59,36 @@ export default function PlayersPage() {
         };
         fetchCalls();
     }, []);
+
+    // Fetch referee for dropdown
+    useEffect(() => {
+        const fetchRefs = async () => {
+            const response = await fetch('/api/referee');
+            const data = await response.json();
+    
+            if (data.error) {
+                console.error('Error fetching referees:', data.error);
+            } else {
+              setRefOptions(data); 
+            }
+        };
+        fetchRefs();
+    }, []);
+
+    // Fetch players for dropdown
+    useEffect(() => {
+      const fetchPlayers = async () => {
+          const response = await fetch('/api/players');
+          const data = await response.json();
+  
+          if (data.error) {
+              console.error('Error fetching players:', data.error);
+          } else {
+            setPlayerOptions(data); 
+          }
+      };
+      fetchPlayers();
+  }, []);
     
     useEffect(() => {
         const timeoutId = setTimeout(() => { setAddPlayerMessage('') }, 8000);
@@ -102,8 +143,44 @@ export default function PlayersPage() {
             setSelectedTeamId(''); 
         } else {
             console.error('Error adding player: ', data.error);
+            const popuperror = document.getElementById('adderror'); 
+            popuperror.classList.remove('hidden');
         }
     };
+
+    // Add Call
+    const handleAddCall = async (e) => {
+      e.preventDefault();
+      const response = await fetch('/api/calls', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ selectedCallType, selectedcommited, selecteddisadvantaged, newDecisionType, selectedTimeLeft, selectedPeriod, selectedref1, selectedref2, selectedref3, selectedComment}),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+          setAddPlayerMessage(data.message);
+
+          // reset the card
+          setselectedCallType('');
+          setCommited('');
+          setDisadvantaged('');
+          setNewDecisionType('');
+          setTimeLeft('');
+          setPeriod('');
+          setSelectedRef1('');
+          setSelectedRef2('');
+          setSelectedRef3('');
+          setComment('');
+
+      } else {
+          console.error('Error adding call: ', data.error);
+
+          const popuperror = document.getElementById('addcallerror'); 
+          popuperror.classList.remove('hidden');
+        }
+  };
 
     // Update Call
     const handleUpdateCall = async (e) => {
@@ -120,7 +197,7 @@ export default function PlayersPage() {
             updateForm.classList.add('hidden');
             handlePlayerCallSearch(e);
         } else {
-            const updateForm = document.getElementById('updatecallerror'); 
+            const updateForm = document.getElementById('error'); 
             updateForm.classList.remove('hidden');
             console.error('Error deleting call:', await response.text());
         }
@@ -149,26 +226,81 @@ export default function PlayersPage() {
         updateForm.classList.remove('hidden');
 
         setSelectedCallId(call_id);
+        setNewCallType(calltype);
+        setNewDecisionType(decision);
 
         const callTypeUp = document.getElementById('form_callType');  
         callTypeUp.value = calltype;
 
-        setNewDecisionType(decision);
     };
 
     // closes the popup
     function hidepopup() {
         const updateForm = document.getElementById('updateForm'); 
+        
         updateForm.classList.add('hidden');
 
-        hideerror();
+        hiderror();
     };
 
     // closes the error in the popup
-    function hideerror() {
-        const popuperror = document.getElementById('updatecallerror'); 
+    function hiderror() {
+        const popuperror = document.getElementById('error'); 
         popuperror.classList.add('hidden');
     }
+
+    // closes the error in the popup
+    function hideaddplayerror() {
+      const popuperror = document.getElementById('adderror'); 
+      popuperror.classList.add('hidden');
+  }
+
+  function hideaddcallerror() {
+    const popuperror = document.getElementById('addcallerror'); 
+    popuperror.classList.add('hidden');
+}
+
+    // shows the player form
+    function showaddplayerform() {
+      const callform = document.getElementById('addplayerform'); 
+      callform.classList.remove('hidden');
+
+      const callformbutton = document.getElementById('addplayer-tab'); 
+      callformbutton.classList.add('text-blue-500');
+      callformbutton.classList.add('border-blue-500');
+
+      const plyeformbutton = document.getElementById('addcall-tab'); 
+      plyeformbutton.classList.remove('text-blue-500');
+      plyeformbutton.classList.remove('border-blue-500');
+
+      const form = document.getElementById('addcallform'); 
+      form.classList.add('hidden');
+
+      const error = document.getElementById('addcallerror'); 
+      error.classList.add('hidden');
+    }
+
+    // shows the call form
+    function showaddcallform() {
+      const callform = document.getElementById('addcallform'); 
+      callform.classList.remove('hidden');
+
+      const callformbutton = document.getElementById('addcall-tab'); 
+      callformbutton.classList.add('text-blue-500');
+      callformbutton.classList.add('border-blue-500');
+
+      const plyeformbutton = document.getElementById('addplayer-tab'); 
+      plyeformbutton.classList.remove('text-blue-500');
+      plyeformbutton.classList.remove('border-blue-500');
+
+      const form = document.getElementById('addplayerform'); 
+      form.classList.add('hidden');
+
+      const error = document.getElementById('adderror'); 
+      error.classList.add('hidden');
+    }
+
+
 
     return (
         <div className="bg-white text-black p-6"> 
@@ -300,15 +432,33 @@ export default function PlayersPage() {
               </form>
             </section>
           </div>
+          
           <section className="mt-8 border border-gray-300 rounded-md p-4">
-            <h2 className="text-xl mb-2">Add Player</h2>
+          <div className="mb-4 border-gray-200 dark:border-gray-700">
+              <ul className="flex flex-wrap text-xl font-medium text-center text-gray-500">
+                  <li className="me-2" role="presentation">
+                      <button className="inline-block p-3 border-b-2 rounded-t-lg active border-blue-500 text-blue-500 hover:border-blue-500 dark:hover:text-blue-500" id="addplayer-tab" onClick={showaddplayerform} type="button" >Add Player</button>
+                  </li>
+                  <li className="me-2" role="presentation">
+                      <button className="inline-block p-3 border-b-2 rounded-t-lg hover:border-blue-500 dark:hover:text-blue-500" id="addcall-tab"  onClick={showaddcallform} type="button">Add Call</button>
+                  </li>
+              </ul>
+          </div>
+            <div id='addplayerform' className=''>
+            <div id='adderror' className="hidden bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded relative p-2" role="alert">
+                    <strong className="font-bold">Add Player Failed!</strong>
+                    <span className="block sm:inline"> Make sure all values are filled.</span>
+                    <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                        <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" onClick={hideaddplayerror} viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+                    </span>
+                    </div>
             <form onSubmit={handleAddPlayer}>
-              <div className="mb-4">
+              <div className="mb-4 py-2">
                 <label
                   htmlFor="newFirstName"
                   className="block text-gray-700 font-bold mb-2"
                 >
-                  New Player First Name:
+                  First Name:
                 </label>
                 <input
                   type="text"
@@ -324,7 +474,7 @@ export default function PlayersPage() {
                   htmlFor="newLastName"
                   className="block text-gray-700 font-bold mb-2"
                 >
-                  New Player Last Name:
+                  Last Name:
                 </label>
                 <input
                   type="text"
@@ -367,6 +517,234 @@ export default function PlayersPage() {
             <div id="addPlayerMessage" className="mt-4 text-green-600">
               {addPlayerMessage}
             </div>
+            </div>
+
+            <div id='addcallform' className='hidden'>
+            <div id="addcallerror" className="hidden bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded relative p-2" role="alert">
+                    <strong className="font-bold">Add Call Failed!</strong>
+                    <span className="block sm:inline"> Make sure all values are filled and valid.</span>
+                    <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                        <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" onClick={hideaddcallerror} viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+                    </span>
+                    </div>
+              
+            <form onSubmit={handleAddCall}>
+            <div className="mb-4 py-2">
+                <label
+                  htmlFor="callType"
+                  className="block text-gray-700 font-bold mb-2"
+                >
+                  Call Type:
+                </label>
+                <select
+                  id="form_callType"
+                  value={selectedCallType}
+                  onChange={(e) => setselectedCallType(e.target.value)}
+                  className="border border-gray-300 rounded-md w-full px-3 py-2"
+                >
+                  <option value="">Select a Call Type</option>
+                  {callOptions.map((call) => (
+                    <option key={call.call_type}>
+                      {call.call_type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className='flex flex-row w-max'>
+                <div className="mb-4">
+                  <label
+                    htmlFor="newLastName"s
+                    className="block text-gray-700 font-bold mb-2"
+                  >
+                    Committing:
+                  </label>
+                  <select
+                  id="commitingform"
+                  onChange={(e) => setCommited(e.target.value)}
+                  className="border border-gray-300 rounded-md w-full px-3 py-2 w-max"
+                  value={selectedcommited}
+                >
+                  <option value="">Select a Player</option>
+                  {playerOptions.map((player) => (
+                    <option key={player.player_id} value={player.player_id}>
+                      {player.name}
+                    </option>
+                  ))}
+                </select>
+                </div>
+                <div className="mb-4 px-10">
+                  <label
+                    htmlFor="newLastName"
+                    className="block text-gray-700 font-bold mb-2"
+                  >
+                    Disadvantaged:
+                  </label>
+                  <select
+                  id="disadvatangedform"
+                  onChange={(e) => setDisadvantaged(e.target.value)}
+                  className="border border-gray-300 rounded-md w-full px-3 py-2"
+                  value={selecteddisadvantaged}
+                >
+                  <option value="">Select a Player</option>
+                  {playerOptions.map((player) => (
+                    <option key={player.player_id} value={player.player_id}>
+                      {player.name}
+                    </option>
+                  ))}
+                </select>
+                </div>
+              </div>
+
+                <div className='flex flex-row'>
+              <div className="mb-4">
+                  <label
+                    htmlFor="decisionType"
+                    className="block text-gray-700 font-bold mb-2"
+                  >
+                    Decision:
+                  </label>
+                  <select
+                    id="form_decisionType"
+                    value={newDecisionType}
+                    onChange={(e) => {setNewDecisionType(e.target.value)}}
+                    className="border border-gray-300 rounded-md w-full px-3 py-2 w-max"
+                  >
+                    <option value="">Select a Decision</option>
+                    <option value="CC">CC</option>
+                    <option value="CNC">CNC</option>
+                    <option value="INC">INC</option>
+                    <option value="IC">IC</option>
+                  </select>
+                </div>
+
+                <div className="mb-4 px-10">
+                <label
+                  htmlFor="timeleftform"
+                  className="block text-gray-700 font-bold mb-2"
+                >
+                  Time Left:
+                </label>
+                <input
+                  type="text"
+                  id="timeleftform"
+                  value={selectedTimeLeft}
+                  onChange={(e) => setTimeLeft(e.target.value)}
+                  className="border border-gray-300 rounded-md w-full px-3 py-2 w-20"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label
+                  htmlFor="newLastName"
+                  className="block text-gray-700 font-bold mb-2"
+                >
+                  Period:
+                </label>
+                <input
+                  type="text"
+                  id="newLastName"
+                  value={selectedPeriod}
+                  onChange={(e) => setPeriod(parseInt(e.target.value))}
+                  className="border border-gray-300 rounded-md w-full px-3 py-2 w-10"
+                  maxLength={1}
+                />
+              </div>
+              </div>
+
+              <div className='flex flex-row'>
+              <div className="mb-4">
+                <label
+                  htmlFor="newLastName"
+                  className="block text-gray-700 font-bold mb-2 "
+                >
+                  Ref1:
+                </label>
+                <select
+                  id="newref1entry"
+                  onChange={(e) => setSelectedRef1(e.target.value)}
+                  className="border border-gray-300 rounded-md w-full px-3 py-2"
+                  value={selectedref1}
+                >
+                  <option value="">Select a Referee</option>
+                  {refOptions.map((ref) => (
+                    <option key={ref.ref_id} value={ref.ref_id}>
+                      {ref.name}
+                    </option>
+                  ))}
+                </select>
+                
+              </div>
+              <div className="mb-4 px-10">
+                <label
+                  htmlFor="newLastName"
+                  className="block text-gray-700 font-bold mb-2 "
+                >
+                  Ref2:
+                </label>
+                <select
+                  id="newref1entry"
+                  onChange={(e) => setSelectedRef2(e.target.value)}
+                  className="border border-gray-300 rounded-md w-full px-3 py-2"
+                  value={selectedref2}
+                >
+                  <option value="">Select a Referee</option>
+                  {refOptions.map((ref) => (
+                    <option key={ref.ref_id} value={ref.ref_id}>
+                      {ref.name}
+                    </option>
+                  ))}
+                </select>
+                
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="newLastName"
+                  className="block text-gray-700 font-bold mb-2 "
+                >
+                  Ref3:
+                </label>
+                <select
+                  id="newref1entry"
+                  onChange={(e) => setSelectedRef3(e.target.value)}
+                  className="border border-gray-300 rounded-md w-full px-3 py-2"
+                  value={selectedref3}
+                >
+                  <option value="">Select a Referee</option>
+                  {refOptions.map((ref) => (
+                    <option key={ref.ref_id} value={ref.ref_id}>
+                      {ref.name}
+                    </option>
+                  ))}
+                </select>
+                
+              </div>
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="newLastName"
+                  className="block text-gray-700 font-bold mb-2 "
+                >
+                  Comments:
+                </label>
+                <input
+                  type="text"
+                  id="newLastName"
+                  onChange={(e) => setComment(e.target.value)}
+                  className="border border-gray-300 rounded-md w-full px-3 py-2"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              >
+                Add Call
+              </button>
+            </form>
+            <div id="addPlayerMessage" className="mt-4 text-green-600">
+              {addPlayerMessage}
+            </div>
+            </div>
           </section>
           <section className="mt-8">
             
@@ -374,11 +752,11 @@ export default function PlayersPage() {
             <div id="updateForm" className="hidden fixed inset-0 bg-gray-500 bg-opacity-50 overflow-y-auto px-4 py-6 sm:px-0 content-center">
                 
                 <div className="relative w-full max-w-sm mx-auto rounded-md shadow-lg bg-white">
-                <div id='updatecallerror' class=" hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative p-2" role="alert">
-                    <strong class="font-bold">Invalid Call!</strong>
-                    <span class="block sm:inline">   Please try again.</span>
-                    <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-                        <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" onClick={hideerror} viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+                <div id='error' className=" hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative p-2" role="alert">
+                    <strong className="font-bold">Invalid Call!</strong>
+                    <span className="block sm:inline">   Please try again.</span>
+                    <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                        <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" onClick={hiderror} viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
                     </span>
                     </div>
                     <div className="flex justify-between items-center p-4 border-b border-gray-200">
@@ -399,6 +777,7 @@ export default function PlayersPage() {
                 <select
                   id="form_callType"
                   onChange={(e) => setNewCallType(e.target.value)}
+                  value={newCallType}
                   className="border border-gray-300 rounded-md w-full px-3 py-2"
                 >
                   <option value="">Select a Call Type</option>
@@ -478,7 +857,7 @@ export default function PlayersPage() {
                               viewBox="0 0 24 24"
                               stroke-width="1.5"
                               stroke="currentColor"
-                              class="w-6 h-6">
+                              className="w-6 h-6">
                               <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
@@ -496,7 +875,7 @@ export default function PlayersPage() {
                               viewBox="0 0 24 24"
                               stroke-width="1.5"
                               stroke="currentColor"
-                              class="w-5 h-5">
+                              className="w-5 h-5">
                               <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"

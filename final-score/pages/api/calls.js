@@ -21,20 +21,14 @@ export default async function handler(req, res) {
         res.status(200).json(rows); 
    }
    else if (req.method === 'POST' ) {
-    const { selectedCallId, newCallType, newDecisionType} = req.body;
-    const db = await mysql.createConnection(dbConfig);
+    // test if commited is passed in to test is update or add
+    const { selectedcommited } = req.body;
 
-    // check for invalid paramaters
-    if(newCallType === "" || newDecisionType === "") {
-        res.status(500).end();
+    if(selectedcommited) {
+        handleAddCall(req, res);
+    }else{
+        handleUpdateCall(req, res);
     }
-
-    const sql = `UPDATE Calls SET call_type = ?, decision = ? WHERE call_id = ?`;
-    const values = [newCallType, newDecisionType, selectedCallId];
-    await db.execute(sql, values);    
-    await db.end(); 
-    
-    res.status(200).json({'message': `Updated call ${selectedCallId}`}); 
    }
    else {
        res.status(405).end();
@@ -53,6 +47,53 @@ const handleDeleteCall = async (callId, res) => {
       } catch (error) {
         console.error('Error deleting call:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+const handleUpdateCall = async (req, res) => {
+    const { selectedCallId, newCallType, newDecisionType} = req.body;
+    try {
+        const db = await mysql.createConnection(dbConfig);
+
+        // check for invalid paramaters
+        if(newCallType === "" || newDecisionType === "") {
+            res.status(500).json({ error: 'Invalid inputs' });
+            return;
+        }
+
+        const sql = `UPDATE Calls SET call_type = ?, decision = ? WHERE call_id = ?`;
+        const values = [newCallType, newDecisionType, selectedCallId];
+        await db.execute(sql, values);    
+        await db.end(); 
+    
+        res.status(200).json({'message': `Updated call ${selectedCallId}`}); 
+      } catch (error) {
+        console.error('Error updating call:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+const handleAddCall = async (req, res) => {
+    const {selectedCallType, selectedcommited, selecteddisadvantaged, newDecisionType, selectedTimeLeft, selectedPeriod, selectedref1, selectedref2, selectedref3, selectedComment} = req.body; 
+    try {
+        const db = await mysql.createConnection(dbConfig);
+        
+        // check for invalid paramaters
+        if(selectedCallType === "" || selectedcommited === "" || selecteddisadvantaged === "" || newDecisionType === "" || selectedTimeLeft === "" || selectedPeriod === ""  || selectedref1 === ""  || selectedref2 === ""  || selectedref3 === "") {
+            res.status(500).json({ error: 'Invalid inputs' });
+            return;
+        }
+        // get a new call id
+        const [rows] = await db.execute(`SELECT call_id FROM Calls ORDER BY call_id DESC LIMIT 1`);
+        const rowResult = rows[0];
+        const newID = rowResult['call_id'] + 1;
+        await db.query(`INSERT INTO Calls (call_id, call_type, committing, disadvantaged, decision , comments, time_left, period, ref1, ref2, ref3) VALUES (${newID}, '${selectedCallType}', '${selectedcommited}', '${selecteddisadvantaged}', '${newDecisionType}', '${selectedComment}', '${selectedTimeLeft}', '${selectedPeriod}', '${selectedref1}', '${selectedref2}',  '${selectedref3}')`);
+        await db.end();
+        
+        res.status(200).json({ message: `Call of ${selectedCallType} was added!` }); 
+    } catch (error) {
+        console.error('Error adding call:', error);
+        res.status(500).json({ error: 'Database error' }); 
     }
 }
 

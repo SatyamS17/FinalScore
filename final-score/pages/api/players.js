@@ -17,8 +17,14 @@ export default async function handler(req, res) {
         } else {
             await handlePlayerCallSearch(req, res);
         }
+    
     } else {
-         res.status(400).json({ error: 'Player name is required' });
+        //  res.status(400).json({ error: 'Player name is required' });
+
+        const db = await mysql.createConnection(dbConfig);
+        const [rows] = await db.execute(`SELECT player_id, CONCAT(Player.first_name, " ", Player.last_name) AS name FROM Player`);
+        await db.end(); 
+        res.status(200).json(rows); 
     }
    } else if (req.method === 'POST') {
     await handleAddPlayer(req, res);
