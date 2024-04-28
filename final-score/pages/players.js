@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import Navbar from './navbar';
 
 export default function PlayersPage() {
     const [playerName, setPlayerName] = useState('');
@@ -303,8 +304,10 @@ export default function PlayersPage() {
 
 
     return (
+      <>
+        <Navbar />
         <div className="bg-white text-black p-6"> 
-        <div className="container mx-auto"> <h1 className='text-3xl font-bold'>Final Score</h1>
+        <div className="container mx-auto">
       
           <div className="grid grid-cols-2 gap-8 mt-6">
             <section className="border border-gray-300 rounded-md p-4">
@@ -902,5 +905,6 @@ export default function PlayersPage() {
           </section>
         </div>
       </div>
+      </>
     );
 }
