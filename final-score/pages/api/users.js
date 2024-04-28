@@ -38,11 +38,19 @@ export default async function handler(req, res) {
     }
    }
    else if (req.method === 'GET' ) {
-        const { email, pwd} = req.body;
+    try {
+        const {email, password} = req.query;
+        console.log('trying to log into:', email);
         const db = await mysql.createConnection(dbConfig);
-        const [rows] = await db.execute('SELECT first_name FROM Users WHERE email = ? AND password = ?', [email, pwd]);
+        const [rows] = await db.execute(`SELECT first_name FROM User WHERE email LIKE '%${email}%' AND password LIKE '%${password}%'`);
         await db.end(); 
+        
         res.status(200).json(rows); 
+    } catch (error) {
+        console.log('ERROR IN GETTING LOGIN');
+        res.status(500).json({ error: 'Internal server error' });
+    }
+        
    }
    else if (req.method === 'POST' ) {
     // if method is post, add a user with fields user_id, first_name, last_name, email, and password into the Users table
@@ -51,6 +59,7 @@ export default async function handler(req, res) {
     // fix
     await db.execute('INSERT INTO Users (user_id, first_name, last_name, email, password) VALUES (?, ?, ?, ?, ?)', [user_id, first_name, last_name, email, password]);
     await db.end();
+    
     res.status(200).json({ message: 'User added successfully' });
    }
    else {
