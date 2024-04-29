@@ -24,45 +24,63 @@ const dbConfig = {
 
 export default async function handler(req, res) {
    if (req.method === 'DELETE' ) {    
-    const { email, pwd} = req.body;
-    try {
-        const query = `DELETE FROM Users WHERE email = ? AND password = ?`;
-        const db = await mysql.createConnection(dbConfig);
-        await db.query(query, [email, pwd]);
-        await db.end(); 
-        
-        res.status(200).json({ message: 'User deleted successfully' });
-      } catch (error) {
-        console.error('Error deleting call:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-   }
-   else if (req.method === 'GET' ) {
-    try {
-        const {email, password} = req.query;
-        console.log('trying to log into:', email);
-        const db = await mysql.createConnection(dbConfig);
-        const [rows] = await db.execute(`SELECT first_name FROM User WHERE email LIKE '%${email}%' AND password LIKE '%${password}%'`);
-        await db.end(); 
-        
-        res.status(200).json(rows); 
-    } catch (error) {
-        console.log('ERROR IN GETTING LOGIN');
-        res.status(500).json({ error: 'Internal server error' });
-    }
-        
-   }
-   else if (req.method === 'POST' ) {
-    // if method is post, add a user with fields user_id, first_name, last_name, email, and password into the Users table
-    const { first_name, last_name, email, password } = req.body;
-    const db = await mysql.createConnection(dbConfig);
-    // fix
-    await db.execute('INSERT INTO Users (user_id, first_name, last_name, email, password) VALUES (?, ?, ?, ?, ?)', [user_id, first_name, last_name, email, password]);
-    await db.end();
-    
-    res.status(200).json({ message: 'User added successfully' });
+        const { email, pwd} = req.body;
+        try {
+            const query = `DELETE FROM Users WHERE email = ? AND password = ?`;
+            const db = await mysql.createConnection(dbConfig);
+            await db.query(query, [email, pwd]);
+            await db.end(); 
+            
+            res.status(200).json({ message: 'User deleted successfully' });
+            } catch (error) {
+            console.error('Error deleting call:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+        }
+        else if (req.method === 'GET' ) {
+        console.log('trying to get??');
+        try {
+            const {email, password} = req.query;
+            console.log('trying to log into:', email);
+            const db = await mysql.createConnection(dbConfig);
+            const [rows] = await db.execute(`SELECT first_name FROM User WHERE email LIKE '%${email}%' AND password LIKE '%${password}%'`);
+            await db.end(); 
+            
+            res.status(200).json(rows); 
+        } catch (error) {
+            console.log('ERROR IN GETTING LOGIN');
+            res.status(500).json({ error: 'Internal server error' });
+        }  
+   } else if (req.method === 'POST' ) {
+        handleAddUser(req, res);
    }
    else {
        res.status(405).end();
    }
+}
+
+const handleAddUser = async (req, res) => {
+    const { newFirstName, newLastName, newEmail, newPassword } = req.body;
+    const db = await mysql.createConnection(dbConfig);
+    try {
+        await db.query('START TRANSACTION');
+        const [existingUsers] = await db.execute(`SELECT * FROM User WHERE email = ? FOR UPDATE`, [newEmail]);
+        if (existingUsers.length > 0) {
+            await db.query('ROLLBACK');
+            res.status(400).json({ error: 'Email already exists' });
+            return;
+        }
+        const [rows] = await db.execute(`SELECT user_id FROM User ORDER BY user_id DESC LIMIT 1 FOR UPDATE`);
+        const rowResult = rows[0];
+        const newID = rowResult['user_id'] + 1;
+        await db.query(`INSERT INTO User (user_id, first_name, last_name, email, password) VALUES (?, ?, ?, ?, ?)`, [newID, newFirstName, newLastName, newEmail, newPassword]);
+        await db.query('COMMIT');
+        res.status(201).json({ message: `${newFirstName} successfully signed up!` }); 
+    } catch (error) {
+        await db.query('ROLLBACK');
+        console.error('Error adding user:', error);
+        res.status(500).json({ error: 'Database error' }); 
+    } finally {
+        await db.end();
+    }
 }
