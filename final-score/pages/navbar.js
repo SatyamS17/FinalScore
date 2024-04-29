@@ -1,10 +1,12 @@
 "use client"
-import React from "react";
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import basketball from '../public/basketball.webp';
 
+
 const Navbar = () => {
+    
   return (
     <div className="flex justify-between bg-white mt-5 mx-14">
         <div className="flex gap-3 ">

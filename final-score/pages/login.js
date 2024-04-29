@@ -8,6 +8,7 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [token, setToken] = useState('');
+    const [userName, setUserName] = useState('');
 
     // useEffect(() => {
     //     const token = cookieParser.parse(document.cookie).token;
@@ -22,7 +23,7 @@ export default function Login() {
             const response = await fetch(`/api/users?email=${email}&password=${password}`);
             const data = await response.json();
             if (data.length > 0) {
-                setToken(data[0].first_name);
+                setUserName(data[0].first_name);
                 setMessage(`Welcome, ${data[0].first_name}!`);
                 // document.cookie = `token=${data[0].first_name}`;
             }
@@ -33,7 +34,7 @@ export default function Login() {
 
     return (
         <>
-            <Navbar />
+            <Navbar/>
             <div className="flex items-center justify-center mt-32 p-6">
                 <form className='w-full max-w-sm bg-gray-100 rounded-lg shadow-md p-6' onSubmit={handleLogin}>
                     <h1 className='text-2xl font-bold mb-4'>Login</h1>
