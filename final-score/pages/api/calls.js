@@ -116,7 +116,7 @@ const handleAddCall = async (req, res) => {
         const [rows] = await db.execute(`SELECT call_id FROM Calls ORDER BY call_id DESC LIMIT 1`);
         const rowResult = rows[0];
         const newID = rowResult['call_id'] + 1;
-        await db.query(`INSERT INTO Calls (call_id, call_type, committing, disadvantaged, decision , comments, time_left, period, ref1, ref2, ref3) VALUES (${newID}, '${selectedCallType}', '${selectedcommited}', '${selecteddisadvantaged}', '${newDecisionType}', '${selectedComment}', '${selectedTimeLeft}', '${selectedPeriod}', '${selectedref1}', '${selectedref2}',  '${selectedref3}')`);
+        await db.query(`INSERT INTO Calls (call_id, game, call_type, committing, disadvantaged, decision , comments, time_left, period, ref1, ref2, ref3) VALUES (${newID}, 52200202, '${selectedCallType}', '${selectedcommited}', '${selecteddisadvantaged}', '${newDecisionType}', '${selectedComment}', '${selectedTimeLeft}', '${selectedPeriod}', '${selectedref1}', '${selectedref2}',  '${selectedref3}')`);
         await db.end();
         
         res.status(200).json({ message: `Call of ${selectedCallType} was added!` }); 
