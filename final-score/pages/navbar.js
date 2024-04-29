@@ -11,14 +11,13 @@ const Navbar = () => {
             <Image
             src={basketball} 
             alt="basketball"
-            height={50} 
+            width={50} 
             
             
             />
             <h1 className="text-3xl font-bold mt-2"><Link href="/">Final Score</Link></h1>
         </div>
         <div className="flex gap-5">
-            
             <div className="flex mb-2 justify-start items-center gap-4 hover:bg-gray-900 px-4 py-2 rounded-md group cursor-pointer hover:shadow-lg m-auto transition-all ease-linear duration-200">
                 <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
                 <Link href="/players">Players</Link>
@@ -35,7 +34,6 @@ const Navbar = () => {
                 </h3>
             </div>
         </div>
-        
     </div>
   );
 };

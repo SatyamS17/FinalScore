@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 
 var insert_user_query = `
-BEGIN TRANSACTION insert_user;
+~ TRANSACTION insert_user;
 SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 INSERT INTO Users (user_id, first_name, last_name, email, password) VALUES ((
     SELECT MAX(user_id) + 1 FROM Users
