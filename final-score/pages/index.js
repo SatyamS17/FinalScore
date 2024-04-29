@@ -87,11 +87,10 @@ async function handleFunFact(queryNumber) {
         <select
           id="decisionType"
           className="border border-gray-300 rounded-md w-full px-3 py-2"
-          // onChange={(e) => setFunFact(e.target.value)}
           onClick={(e) => handleFunFact(e.target.value)}
         >
           <option value="0">Select an Option</option>
-          <option value="1">Teams with Highest attendance</option>
+          <option value="1">Teams With Highest Attendance</option>
           <option value="2">Top Foul Commiting Players</option>
           <option value="3">Most Disadvantaged Players</option>
         </select>
@@ -99,9 +98,9 @@ async function handleFunFact(queryNumber) {
       <div className='flex flex-col items-center'>
       <button  className="bg-blue-500 text-white font-bold px-6 py-2 rounded-md hover:scale-120 hover:bg-gradient-to-r from-orange-400 to-blue-500" onClick={() => handleFunFact(Math.floor(Math.random() * 3) + 1)}> RANDOM!</button>
       </div>
-      <div id='attendance' className='hidden p-10'>
-        <table className="w-full table-auto border-collapse border text-center"> <thead>
-                <tr>
+      <div id='attendance' className='hidden p-10 container mx-auto items-center justify-center flex'>
+        <table className="table-auto border-collapse border text-center"> <thead>
+                <tr className='bg-gray-300'>
                   <th className="border p-2">Team</th>
                   <th className="border p-2">Average Attendance</th>
                   <th className="border p-2">Max Attendance</th>
@@ -119,9 +118,9 @@ async function handleFunFact(queryNumber) {
             </table>
       </div>
 
-      <div id='foulmaster' className='hidden p-10'>
-        <table className="w-full table-auto border-collapse border text-center"> <thead>
-                <tr>
+      <div id='foulmaster' className='hidden p-10 container mx-auto items-center justify-center flex'>
+        <table className="table-auto border-collapse border text-center"> <thead>
+                <tr className='bg-gray-300'>
                   <th className="border p-2">Name</th>
                   <th className="border p-2">Fouls Commited</th>
                 </tr>
@@ -137,9 +136,9 @@ async function handleFunFact(queryNumber) {
         </table>
       </div>
 
-      <div id='disadvantagedking' className='hidden p-10'>
-        <table className="w-full table-auto border-collapse border text-center"> <thead>
-                <tr>
+      <div id='disadvantagedking' className='hidden p-10 container mx-auto items-center justify-center flex'>
+        <table className="table-auto border-collapse border text-center"> <thead>
+                <tr className='bg-gray-300'>
                   <th className="border p-2">Name</th>
                   <th className="border p-2">Disadvantaged Calls</th>
                 </tr>
