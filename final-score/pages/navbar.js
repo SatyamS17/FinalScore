@@ -11,7 +11,7 @@ const Navbar = () => {
             <Image
             src={basketball} 
             alt="basketball"
-            width={50} 
+            height={50} 
             
             
             />
@@ -22,6 +22,11 @@ const Navbar = () => {
             <div className="flex mb-2 justify-start items-center gap-4 hover:bg-gray-900 px-4 py-2 rounded-md group cursor-pointer hover:shadow-lg m-auto transition-all ease-linear duration-200">
                 <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
                 <Link href="/players">Players</Link>
+                </h3>
+            </div>
+            <div className="flex mb-2 justify-start items-center gap-4 hover:bg-gray-900 px-4 py-2 rounded-md group cursor-pointer hover:shadow-lg m-auto transition-all ease-linear duration-200">
+                <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
+                <Link href="/signup">Sign Up</Link>
                 </h3>
             </div>
             <div className="flex mb-2 justify-start items-center gap-4 hover:bg-gray-900 px-4 py-2 rounded-md group cursor-pointer hover:shadow-lg m-auto transition-all ease-linear duration-200">
