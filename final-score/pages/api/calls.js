@@ -8,8 +8,41 @@ const dbConfig = {
     database: 'final-score'
 };
 
+async function createTrigger() {
+    const db = await mysql.createConnection(dbConfig);
+    const sql1 = `
+    DROP TRIGGER IF EXISTS update_decisions;
+    `;
+    const sql = `
+    CREATE TRIGGER update_decisions 
+    BEFORE UPDATE ON Calls
+    FOR EACH ROW
+    BEGIN
+        IF NEW.decision IS NULL OR NEW.decision = '' THEN
+            SET NEW.decision = 'PENDING';
+        END IF;
 
-export default async function handler(req, res) {
+        IF NEW.call_type IS NULL OR NEW.call_type = '' THEN
+            SET NEW.decision = 'PENDING';
+            SET NEW.call_type = 'PENDING';
+        END IF;
+    END;
+    `;
+    try {
+        await db.query(sql1);
+        await db.query(sql);
+        console.log("Trigger created successfully!");
+    } catch (error) {
+        console.log(error);
+    } finally {
+      await db.end();
+    }
+}
+
+  export default async function handler(req, res) {
+    
+    await createTrigger();
+
    if (req.method === 'DELETE' ) {    
     const { callId } = req.body;
     await handleDeleteCall(callId, res);
@@ -54,12 +87,6 @@ const handleUpdateCall = async (req, res) => {
     const { selectedCallId, newCallType, newDecisionType} = req.body;
     try {
         const db = await mysql.createConnection(dbConfig);
-
-        // check for invalid paramaters
-        if(newCallType === "" || newDecisionType === "") {
-            res.status(500).json({ error: 'Invalid inputs' });
-            return;
-        }
 
         const sql = `UPDATE Calls SET call_type = ?, decision = ? WHERE call_id = ?`;
         const values = [newCallType, newDecisionType, selectedCallId];
