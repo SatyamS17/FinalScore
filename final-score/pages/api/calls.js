@@ -85,19 +85,21 @@ const handleDeleteCall = async (callId, res) => {
 
 const handleUpdateCall = async (req, res) => {
     const { selectedCallId, newCallType, newDecisionType} = req.body;
+    const db = await mysql.createConnection(dbConfig);
     try {
-        const db = await mysql.createConnection(dbConfig);
-
         const sql = `UPDATE Calls SET call_type = ?, decision = ? WHERE call_id = ?`;
         const values = [newCallType, newDecisionType, selectedCallId];
-        await db.execute(sql, values);    
-        await db.end(); 
-    
+        await db.query('START TRANSACTION');
+        await db.execute(sql, values);
+        await db.query('COMMIT');
         res.status(200).json({'message': `Updated call ${selectedCallId}`}); 
       } catch (error) {
+        await db.query('ROLLBACK');
         console.error('Error updating call:', error);
         res.status(500).json({ error: 'Internal server error' });
-    }
+      } finally {
+        await db.end(); 
+      }
 }
 
 const handleAddCall = async (req, res) => {

@@ -38,10 +38,8 @@ export default async function handler(req, res) {
         }
         }
         else if (req.method === 'GET' ) {
-        console.log('trying to get??');
         try {
             const {email, password} = req.query;
-            console.log('trying to log into:', email);
             const db = await mysql.createConnection(dbConfig);
             const [rows] = await db.execute(`SELECT first_name FROM User WHERE email LIKE '%${email}%' AND password LIKE '%${password}%'`);
             await db.end(); 
